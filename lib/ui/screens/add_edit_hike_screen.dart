@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/hike_provider.dart';
@@ -25,9 +27,9 @@ class _AddEditHikeScreenState extends State<AddEditHikeScreen> {
     super.initState();
     _nameController = TextEditingController(text: widget.hike?.name ?? '');
     _locationController = TextEditingController(text: widget.hike?.location ?? '');
-    _dateController = TextEditingController(text: widget.hike?.date ?? '');
-    _parkingAvailableController = TextEditingController(text: widget.hike?.parkingAvailable ?? '');
-    _lengthController = TextEditingController(text: widget.hike?.length ?? '');
+    _dateController = TextEditingController(text: widget.hike?.date.toString() ?? '');
+    _parkingAvailableController = TextEditingController(text: widget.hike?.parkingAvailable == true ? 'yes' : 'no');
+    _lengthController = TextEditingController(text: widget.hike?.length.toString() ?? '');
     _difficultyController = TextEditingController(text: widget.hike?.difficulty ?? '');
     _descriptionController = TextEditingController(text: widget.hike?.description ?? '');
   }
@@ -168,9 +170,9 @@ class _AddEditHikeScreenState extends State<AddEditHikeScreen> {
         id: widget.hike?.id,
         name: _nameController.text.trim(),
         location: _locationController.text.trim(),
-        date: _dateController.text.trim(),
-        parkingAvailable: _parkingAvailableController.text.trim(),
-        length: _lengthController.text.trim(),
+        date: DateTime.parse(_dateController.text.trim()),
+        parkingAvailable:_parkingAvailableController.text.trim() == "yes" ? true : false,
+        length: _lengthController.text.trim().isEmpty ? 0 : double.parse(_lengthController.text.trim()),
         difficulty: _difficultyController.text.trim(),
         description: _descriptionController.text.trim(),
       );

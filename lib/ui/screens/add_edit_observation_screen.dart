@@ -16,11 +16,12 @@ class _AddEditObservationScreenState extends State<AddEditObservationScreen> {
   late TextEditingController _commentsController;
   bool _isSaving = false;
   bool get isEditing => widget.observation != null;
+
   @override
   void initState() {
     super.initState();
     _titleController = TextEditingController(text: widget.observation?.title ?? '');
-    _timestampController = TextEditingController(text: widget.observation?.timestamp ?? '');
+    _timestampController = TextEditingController(text: widget.observation?.timestamp.toString() ?? '');
     _commentsController = TextEditingController(text: widget.observation?.comments ?? '');
   }
   @override
@@ -155,9 +156,9 @@ class _AddEditObservationScreenState extends State<AddEditObservationScreen> {
       final observation = Observation(
         id: widget.observation?.id,
         title: _titleController.text.trim(),
-        timestamp: _timestampController.text.trim(),
+        timestamp: DateTime.parse(_timestampController.text.trim()) ,
         comments: _commentsController.text.trim(),
-        hikeId: _hikeId,
+        hikeId: widget.observation?.hikeId ?? -1,
       );
       final observationProvider = context.read<ObservationProvider>();
 
