@@ -224,8 +224,9 @@ class _AddEditHikeScreenState extends State<AddEditHikeScreen> {
         if (value == null || value.trim().isEmpty) {
           return 'Please enter a date';
         }
-        if (value.trim().length < 2) {
-          return 'Length must be at least 2 characters';
+        final RegExp lengthRegExp = RegExp(r'^\d+(\.\d+)?$');
+        if (!lengthRegExp.hasMatch(value.trim())) {
+          return 'Please enter a valid length';
         }
         return null;
       },
@@ -246,7 +247,7 @@ class _AddEditHikeScreenState extends State<AddEditHikeScreen> {
   }
   Widget _buildDifficultyField() {
     return DropdownButtonFormField<String>(
-      value: _difficulty,
+      initialValue: _difficulty,
       decoration: const InputDecoration(
         labelText: 'Difficulty *',
         border: OutlineInputBorder(),
