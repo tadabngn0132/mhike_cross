@@ -58,6 +58,8 @@ class _AddEditHikeScreenState extends State<AddEditHikeScreen> {
       return;
 
     }
+    final confirmed = await _showConfirmationDialog();
+    if (!confirmed) return;
     setState(() {
       _isSaving = true;
     });
@@ -304,5 +306,40 @@ class _AddEditHikeScreenState extends State<AddEditHikeScreen> {
       onPressed: _isSaving ? null : () => Navigator.pop(context),
       child: const Text('Cancel'),
     );
+  }
+
+  Future<bool> _showConfirmationDialog() async {
+    return await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Confirm Hike Details'),
+        content: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text('Name: ${_nameController.text}'),
+              Text('Location: ${_locationController.text}'),
+              Text('Date: ${_selectedDate.day}/${_selectedDate.month}/${_selectedDate.year}'),
+              Text('Length: ${_lengthController.text} km'),
+              Text('Parking: ${_parkingAvailable ? "Yes" : "No"}'),
+              Text('Difficulty: $_difficulty'),
+              if (_descriptionController.text.isNotEmpty)
+                Text('Description: ${_descriptionController.text}'),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Edit'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Confirm'),
+          ),
+        ],
+      ),
+    ) ?? false;
   }
 }

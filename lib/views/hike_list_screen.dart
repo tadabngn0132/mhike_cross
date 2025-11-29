@@ -15,6 +15,29 @@ class HikeListScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('All hikes'),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        actions: [
+          // Menu button với delete all option
+          PopupMenuButton<String>(
+            icon: const Icon(Icons.more_vert),
+            onSelected: (value) {
+              if (value == 'deleteAll') {
+                _showDeleteAllConfirmation(context);
+              }
+            },
+            itemBuilder: (context) => [
+              const PopupMenuItem(
+                value: 'deleteAll',
+                child: Row(
+                  children: [
+                    Icon(Icons.delete_forever, color: Colors.red),
+                    SizedBox(width: 8),
+                    Text('Delete All Hikes', style: TextStyle(color: Colors.red)),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
       body: Consumer<HikeViewModel>(
         builder: (context, viewModel, child) {
@@ -306,6 +329,93 @@ class HikeListScreen extends StatelessWidget {
               foregroundColor: Theme.of(context).colorScheme.error,
             ),
             child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Delete All Confirmation Dialog
+  void _showDeleteAllConfirmation(BuildContext context) {
+    final viewModel = Provider.of<HikeViewModel>(context, listen: false);
+
+    if (viewModel.hikes.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('No hikes to delete'),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      return;
+    }
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Row(
+          children: [
+            Icon(Icons.warning, color: Colors.red),
+            SizedBox(width: 8),
+            Text('Delete All Hikes'),
+          ],
+        ),
+        content: Text(
+          'Are you sure you want to delete ALL ${viewModel.hikes.length} hike(s)?\n\n'
+              'This action cannot be undone!',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              Navigator.pop(context);
+
+              // Show loading indicator
+              showDialog(
+                context: context,
+                barrierDismissible: false,
+                builder: (context) => const Center(
+                  child: CircularProgressIndicator(),
+                ),
+              );
+
+              try {
+                await viewModel.deleteAllHikes();
+
+                // Close loading dialog
+                if (context.mounted) {
+                  Navigator.pop(context);
+
+                  // Show success message
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('All hikes deleted successfully'),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+                }
+              } catch (error) {
+                // Close loading dialog
+                if (context.mounted) {
+                  Navigator.pop(context);
+
+                  // Show error message
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Error: ${error.toString()}'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('Delete All'),
           ),
         ],
       ),

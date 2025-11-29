@@ -2,7 +2,6 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import '../models/hike.dart';
-import '../models/observation.dart';
 /// Handles all database operations
 class DatabaseService {
   static final DatabaseService _instance = DatabaseService._internal();
@@ -41,17 +40,6 @@ class DatabaseService {
       description TEXT
       )
     ''');
-
-    await database.execute('''
-      CREATE TABLE observations(
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      title TEXT NOT NULL,
-      timestamp TEXT NOT NULL,
-      comments TEXT,
-      hikeId INTEGER NOT NULL,
-      FOREIGN KEY (hikeId) REFERENCES hikes (id) ON DELETE CASCADE
-      )
-    ''');
   }
   /// Add a new hike
 
@@ -84,36 +72,9 @@ class DatabaseService {
         whereArgs: [hikeId]
     );
   }
-
-  /// Add a new observation
-
-  Future<int> insertObservation(Observation observation) async {
+  /// Delete all hikes
+  Future<int> deleteAllHikes() async {
     final db = await database;
-    return await db.insert('observations', observation.toMap());
-  }
-  /// Get all observations
-  Future<List<Observation>> getAllObservations() async {
-    final db = await database;
-    final observationMaps = await db.query('observations', orderBy: 'title ASC');
-    return observationMaps.map((map) => Observation.fromMap(map)).toList();
-  }
-  /// Update a observation
-  Future<int> updateObservation(Observation observation) async {
-    final db = await database;
-    return await db.update(
-        'observations',
-        observation.toMap(),
-        where: 'id = ?',
-        whereArgs: [observation.id]
-    );
-  }
-  /// Delete a observation
-  Future<int> deleteObservation(int observationId) async {
-    final db = await database;
-    return await db.delete(
-        'observations',
-        where: 'id = ?',
-        whereArgs: [observationId]
-    );
+    return await db.delete('hikes');
   }
 }

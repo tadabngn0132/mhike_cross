@@ -65,6 +65,19 @@ class HikeViewModel extends ChangeNotifier {
       _setLoading(false);
     }
   }
+  /// Delete all hikes
+  Future<void> deleteAllHikes() async {
+    try {
+      _setLoading(true);
+      _clearError();
+      await _databaseService.deleteAllHikes();
+      await loadHikes(); // Refresh the list
+    } catch (error) {
+      _setError('Failed to delete all hikes: $error');
+    } finally {
+      _setLoading(false);
+    }
+  }
 // Private helper methods
   void _clearError() {
     _errorMessage = null;
