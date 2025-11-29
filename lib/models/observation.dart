@@ -1,11 +1,11 @@
-import 'package:equatable/equatable.dart';
-/// Simple Observation model with basic fields
-class Observation extends Equatable {
+/// Observation model - represents a observation in the app
+class Observation {
   final int? id;
   final String title;
   final DateTime timestamp;
   final String comments;
   final int hikeId;
+  /// Create a new observation
   const Observation({
     this.id,
     required this.title,
@@ -48,7 +48,6 @@ class Observation extends Equatable {
       comments: comments ?? this.comments,
       hikeId: hikeId ?? this.hikeId,
     );
+
   }
-  @override
-  List<Object?> get props => [id, title, timestamp, comments, hikeId];
 }

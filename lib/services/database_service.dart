@@ -3,10 +3,12 @@ import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import '../models/hike.dart';
 import '../models/observation.dart';
-/// Handles all database operations for the app
+/// Handles all database operations
 class DatabaseService {
+  static final DatabaseService _instance = DatabaseService._internal();
+  factory DatabaseService() => _instance;
+  DatabaseService._internal();
   static Database? _database;
-
   static const String _databaseName = 'm_hike.db';
   static const int _databaseVersion = 1;
   /// Get database instance
@@ -30,15 +32,12 @@ class DatabaseService {
     await database.execute('''
       CREATE TABLE hikes(
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      name TEXT NOT NULL,
-      location TEXT NOT NULL,
-      date TEXT NOT NULL,
-      parkingAvailable INTEGER NOT NULL,
-      length REAL NOT NULL,
-      difficulty TEXT NOT NULL,
+      title TEXT NOT NULL,
+      author TEXT NOT NULL,
       description TEXT
       )
     ''');
+
     await database.execute('''
       CREATE TABLE observations(
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -50,7 +49,8 @@ class DatabaseService {
       )
     ''');
   }
-  /// Insert a new hike
+  /// Add a new hike
+
   Future<int> insertHike(Hike hike) async {
     final db = await database;
     return await db.insert('hikes', hike.toMap());
@@ -69,7 +69,6 @@ class DatabaseService {
         hike.toMap(),
         where: 'id = ?',
         whereArgs: [hike.id]
-
     );
   }
   /// Delete a hike
@@ -82,7 +81,8 @@ class DatabaseService {
     );
   }
 
-  /// Insert a new observation
+  /// Add a new observation
+
   Future<int> insertObservation(Observation observation) async {
     final db = await database;
     return await db.insert('observations', observation.toMap());
@@ -101,7 +101,6 @@ class DatabaseService {
         observation.toMap(),
         where: 'id = ?',
         whereArgs: [observation.id]
-
     );
   }
   /// Delete a observation
@@ -112,14 +111,5 @@ class DatabaseService {
         where: 'id = ?',
         whereArgs: [observationId]
     );
-  }
-
-  /// Close database
-  Future<void> close() async {
-    final db = _database;
-    if (db != null) {
-      await db.close();
-      _database = null;
-    }
   }
 }

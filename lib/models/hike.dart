@@ -1,24 +1,23 @@
-import 'package:equatable/equatable.dart';
-/// Simple Hike model with basic fields
-class Hike extends Equatable {
+/// Hike model - represents a hike in the app
+class Hike {
   final int? id;
   final String name;
   final String location;
   final DateTime date;
-  final bool parkingAvailable;
   final double length;
+  final bool parkingAvailable;
   final String difficulty;
   final String description;
+  /// Create a new hike
   const Hike({
     this.id,
     required this.name,
     required this.location,
     required this.date,
-    required this.parkingAvailable,
     required this.length,
+    required this.parkingAvailable,
     required this.difficulty,
     required this.description,
-
   });
   /// Create a Hike from database data
   factory Hike.fromMap(Map<String, dynamic> map) {
@@ -27,8 +26,8 @@ class Hike extends Equatable {
       name: map['name'] as String,
       location: map['location'] as String,
       date: DateTime.parse(map['date'] as String),
+      length: map['length'] as double,
       parkingAvailable: (map['parkingAvailable'] as int) == 1,
-      length: (map['length'] as num).toDouble(),
       difficulty: map['difficulty'] as String,
       description: map['description'] as String? ?? '',
     );
@@ -40,8 +39,8 @@ class Hike extends Equatable {
       'name': name,
       'location': location,
       'date': date.toIso8601String(),
-      'parkingAvailable': parkingAvailable ? 1 : 0,
       'length': length,
+      'parkingAvailable': parkingAvailable ? 1 : 0,
       'difficulty': difficulty,
       'description': description,
     };
@@ -51,9 +50,9 @@ class Hike extends Equatable {
     int? id,
     String? name,
     String? location,
-    DateTime? date,
-    bool? parkingAvailable,
+    DateTime ? date,
     double? length,
+    bool? parkingAvailable,
     String? difficulty,
     String? description,
   }) {
@@ -62,12 +61,11 @@ class Hike extends Equatable {
       name: name ?? this.name,
       location: location ?? this.location,
       date: date ?? this.date,
-      parkingAvailable: parkingAvailable ?? this.parkingAvailable,
       length: length ?? this.length,
+      parkingAvailable: parkingAvailable ?? this.parkingAvailable,
       difficulty: difficulty ?? this.difficulty,
       description: description ?? this.description,
     );
+
   }
-  @override
-  List<Object?> get props => [id, name, location, date, parkingAvailable, length, difficulty, description];
 }
