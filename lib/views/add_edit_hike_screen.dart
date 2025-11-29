@@ -119,9 +119,17 @@ class _AddEditHikeScreenState extends State<AddEditHikeScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              _buildTitleField(),
+              _buildNameField(),
               const SizedBox(height: 16),
-              _buildAuthorField(),
+              _buildLocationField(),
+              const SizedBox(height: 16),
+              _buildDateField(),
+              const SizedBox(height: 16),
+              _buildLengthField(),
+              const SizedBox(height: 16),
+              _buildParkingAvailableField(),
+              const SizedBox(height: 16),
+              _buildDifficultyField(),
               const SizedBox(height: 16),
               _buildDescriptionField(),
               const SizedBox(height: 24),
@@ -134,21 +142,21 @@ class _AddEditHikeScreenState extends State<AddEditHikeScreen> {
       ),
     );
   }
-  Widget _buildTitleField() {
+  Widget _buildNameField() {
     return TextFormField(
       controller: _nameController,
       decoration: const InputDecoration(
-        labelText: 'Title *',
+        labelText: 'Name *',
         hintText: 'Enter hike name',
         border: OutlineInputBorder(),
-        prefixIcon: Icon(Icons.book),
+        prefixIcon: Icon(Icons.hiking),
       ),
       validator: (value) {
         if (value == null || value.trim().isEmpty) {
           return 'Please enter a name';
         }
         if (value.trim().length < 2) {
-          return 'Title must be at least 2 characters';
+          return 'Name must be at least 2 characters';
         }
         return null;
       },
@@ -156,25 +164,89 @@ class _AddEditHikeScreenState extends State<AddEditHikeScreen> {
       textInputAction: TextInputAction.next,
     );
   }
-  Widget _buildAuthorField() {
+  Widget _buildLocationField() {
     return TextFormField(
       controller: _locationController,
       decoration: const InputDecoration(
-        labelText: 'Author *',
-        hintText: 'Enter location name',
+        labelText: 'Location *',
+        hintText: 'Enter location',
         border: OutlineInputBorder(),
-        prefixIcon: Icon(Icons.person),
+        prefixIcon: Icon(Icons.location_on),
       ),
       validator: (value) {
         if (value == null || value.trim().isEmpty) {
           return 'Please enter an location';
         }
         if (value.trim().length < 2) {
-          return 'Author name must be at least 2 characters';
+          return 'Location must be at least 2 characters';
         }
         return null;
       },
       textInputAction: TextInputAction.next,
+    );
+  }
+  Widget _buildDateField() {
+    return InputDatePickerFormField(
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2100),
+      fieldLabelText: 'Date *',
+      initialDate: widget.hike?.date ?? DateTime.now(),
+      onDateSaved: (date) {
+        _dateController.text = date.toIso8601String();
+      },
+      onDateSubmitted: (_) => FocusScope.of(context).nextFocus(),
+    );
+  }
+  Widget _buildLengthField() {
+    return TextFormField(
+      controller: _lengthController,
+      decoration: const InputDecoration(
+        labelText: 'Length *',
+        hintText: 'Enter length',
+        border: OutlineInputBorder(),
+        prefixIcon: Icon(Icons.route),
+      ),
+      validator: (value) {
+        if (value == null || value.trim().isEmpty) {
+          return 'Please enter a date';
+        }
+        if (value.trim().length < 2) {
+          return 'Length must be at least 2 characters';
+        }
+        return null;
+      },
+      textInputAction: TextInputAction.next,
+    );
+  }
+  Widget _buildParkingAvailableField() {
+    return SwitchListTile(
+      title: const Text('Parking Available'),
+      value: _parkingAvailableController.text.trim().toLowerCase() == 'yes',
+      onChanged: (value) {
+        setState(() {
+          _parkingAvailableController.text = value ? 'Yes' : 'No';
+        });
+      },
+      secondary: const Icon(Icons.local_parking),
+    );
+  }
+  Widget _buildDifficultyField() {
+    return DropdownMenuFormField(
+      controller: _difficultyController,
+      width: double.infinity,
+      initialSelection: _difficultyController.text.trim() ?? 'Easy',
+      label: const Text('Difficulty *'),
+      leadingIcon: const Icon(Icons.landscape),
+      dropdownMenuEntries: [
+        const DropdownMenuEntry(value: 'Easy', label: 'Easy'),
+        const DropdownMenuEntry(value: 'Moderate', label: 'Moderate'),
+        const DropdownMenuEntry(value: 'Hard', label: 'Hard'),
+      ],
+      onSelected: (String? value) {
+        if (value != null) {
+          _difficultyController.text = value;
+        }
+      },
     );
   }
   Widget _buildDescriptionField() {

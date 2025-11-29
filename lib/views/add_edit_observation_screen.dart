@@ -106,9 +106,9 @@ class _AddEditObservationScreenState extends State<AddEditObservationScreen> {
             children: [
               _buildTitleField(),
               const SizedBox(height: 16),
-              _buildAuthorField(),
+              _buildTimeStampField(),
               const SizedBox(height: 16),
-              _buildDescriptionField(),
+              _buildCommentsField(),
               const SizedBox(height: 24),
               _buildSaveButton(isEditing),
               const SizedBox(height: 16),
@@ -141,32 +141,34 @@ class _AddEditObservationScreenState extends State<AddEditObservationScreen> {
       textInputAction: TextInputAction.next,
     );
   }
-  Widget _buildAuthorField() {
+  Widget _buildTimeStampField() {
     return TextFormField(
       controller: _timestampController,
       decoration: const InputDecoration(
-        labelText: 'Author *',
-        hintText: 'Enter timestamp name',
+        labelText: 'Timestamp *',
+        hintText: 'Enter observation timestamp',
         border: OutlineInputBorder(),
-        prefixIcon: Icon(Icons.person),
+        prefixIcon: Icon(Icons.access_time),
       ),
       validator: (value) {
         if (value == null || value.trim().isEmpty) {
-          return 'Please enter an timestamp';
+          return 'Please enter a timestamp';
         }
-        if (value.trim().length < 2) {
-          return 'Author name must be at least 2 characters';
+        try {
+          DateTime.parse(value.trim());
+        } catch (_) {
+          return 'Please enter a valid timestamp';
         }
         return null;
       },
       textInputAction: TextInputAction.next,
     );
   }
-  Widget _buildDescriptionField() {
+  Widget _buildCommentsField() {
     return TextFormField(
       controller: _commentsController,
       decoration: const InputDecoration(
-        labelText: 'Description',
+        labelText: 'Comments',
         hintText: 'Enter observation comments (optional)',
         border: OutlineInputBorder(),
         prefixIcon: Icon(Icons.book),
