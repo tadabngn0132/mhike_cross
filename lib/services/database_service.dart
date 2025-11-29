@@ -32,8 +32,12 @@ class DatabaseService {
     await database.execute('''
       CREATE TABLE hikes(
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      title TEXT NOT NULL,
-      author TEXT NOT NULL,
+      name TEXT NOT NULL,
+      location TEXT NOT NULL,
+      date TEXT NOT NULL,
+      length REAL NOT NULL,
+      parkingAvailable INTEGER NOT NULL,
+      difficulty TEXT NOT NULL,
       description TEXT
       )
     ''');
@@ -58,7 +62,7 @@ class DatabaseService {
   /// Get all hikes
   Future<List<Hike>> getAllHikes() async {
     final db = await database;
-    final hikeMaps = await db.query('hikes', orderBy: 'title ASC');
+    final hikeMaps = await db.query('hikes', orderBy: 'name ASC');
     return hikeMaps.map((map) => Hike.fromMap(map)).toList();
   }
   /// Update a hike

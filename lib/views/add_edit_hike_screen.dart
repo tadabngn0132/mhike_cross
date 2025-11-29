@@ -13,11 +13,11 @@ class _AddEditHikeScreenState extends State<AddEditHikeScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _locationController = TextEditingController();
-  final _dateController = TextEditingController();
   final _lengthController = TextEditingController();
-  final _parkingAvailableController = TextEditingController();
-  final _difficultyController = TextEditingController();
   final _descriptionController = TextEditingController();
+  DateTime _selectedDate = DateTime.now();
+  bool _parkingAvailable = false;
+  String _difficulty = 'Easy';
   bool _isSaving = false;
   @override
   void initState() {
@@ -25,10 +25,10 @@ class _AddEditHikeScreenState extends State<AddEditHikeScreen> {
     if (widget.hike != null) {
       _nameController.text = widget.hike!.name;
       _locationController.text = widget.hike!.location;
-      _dateController.text = widget.hike!.date.toString();
+      _selectedDate = widget.hike!.date;
       _lengthController.text = widget.hike!.length.toString();
-      _parkingAvailableController.text = widget.hike!.parkingAvailable ? 'Yes' : 'No';
-      _difficultyController.text = widget.hike!.difficulty;
+      _parkingAvailable = widget.hike!.parkingAvailable;
+      _difficulty = widget.hike!.difficulty;
       _descriptionController.text = widget.hike!.description;
     }
   }
@@ -36,12 +36,22 @@ class _AddEditHikeScreenState extends State<AddEditHikeScreen> {
   void dispose() {
     _nameController.dispose();
     _locationController.dispose();
-    _dateController.dispose();
     _lengthController.dispose();
-    _parkingAvailableController.dispose();
-    _difficultyController.dispose();
     _descriptionController.dispose();
     super.dispose();
+  }
+  Future<void> _selectDate() async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: _selectedDate,
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2100),
+    );
+    if (picked != null && picked != _selectedDate) {
+      setState(() {
+        _selectedDate = picked;
+      });
+    }
   }
   Future<void> _saveHike() async {
     if (!_formKey.currentState!.validate()) {
@@ -57,10 +67,10 @@ class _AddEditHikeScreenState extends State<AddEditHikeScreen> {
         id: widget.hike?.id,
         name: _nameController.text.trim(),
         location: _locationController.text.trim(),
-        date: DateTime.parse(_dateController.text.trim()),
+        date: _selectedDate,
         length: double.parse(_lengthController.text.trim()),
-        parkingAvailable: _parkingAvailableController.text.trim().toLowerCase() == 'yes',
-        difficulty: _difficultyController.text.trim(),
+        parkingAvailable: _parkingAvailable,
+        difficulty: _difficulty,
         description: _descriptionController.text.trim(),
       );
       if (widget.hike == null) {
@@ -186,15 +196,19 @@ class _AddEditHikeScreenState extends State<AddEditHikeScreen> {
     );
   }
   Widget _buildDateField() {
-    return InputDatePickerFormField(
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2100),
-      fieldLabelText: 'Date *',
-      initialDate: widget.hike?.date ?? DateTime.now(),
-      onDateSaved: (date) {
-        _dateController.text = date.toIso8601String();
-      },
-      onDateSubmitted: (_) => FocusScope.of(context).nextFocus(),
+    return InkWell(
+      onTap: _selectDate,
+      child: InputDecorator(
+        decoration: const InputDecoration(
+          labelText: 'Date *',
+          border: OutlineInputBorder(),
+          prefixIcon: Icon(Icons.calendar_today),
+        ),
+        child: Text(
+          '${_selectedDate.day}/${_selectedDate.month}/${_selectedDate.year}',
+          style: Theme.of(context).textTheme.bodyLarge,
+        ),
+      ),
     );
   }
   Widget _buildLengthField() {
@@ -221,30 +235,33 @@ class _AddEditHikeScreenState extends State<AddEditHikeScreen> {
   Widget _buildParkingAvailableField() {
     return SwitchListTile(
       title: const Text('Parking Available'),
-      value: _parkingAvailableController.text.trim().toLowerCase() == 'yes',
+      value: _parkingAvailable,
       onChanged: (value) {
         setState(() {
-          _parkingAvailableController.text = value ? 'Yes' : 'No';
+          _parkingAvailable = value;
         });
       },
       secondary: const Icon(Icons.local_parking),
     );
   }
   Widget _buildDifficultyField() {
-    return DropdownMenuFormField(
-      controller: _difficultyController,
-      width: double.infinity,
-      initialSelection: _difficultyController.text.trim() ?? 'Easy',
-      label: const Text('Difficulty *'),
-      leadingIcon: const Icon(Icons.landscape),
-      dropdownMenuEntries: [
-        const DropdownMenuEntry(value: 'Easy', label: 'Easy'),
-        const DropdownMenuEntry(value: 'Moderate', label: 'Moderate'),
-        const DropdownMenuEntry(value: 'Hard', label: 'Hard'),
+    return DropdownButtonFormField<String>(
+      value: _difficulty,
+      decoration: const InputDecoration(
+        labelText: 'Difficulty *',
+        border: OutlineInputBorder(),
+        prefixIcon: Icon(Icons.landscape),
+      ),
+      items: const [
+        DropdownMenuItem(value: 'Easy', child: Text('Easy')),
+        DropdownMenuItem(value: 'Moderate', child: Text('Moderate')),
+        DropdownMenuItem(value: 'Hard', child: Text('Hard')),
       ],
-      onSelected: (String? value) {
+      onChanged: (String? value) {
         if (value != null) {
-          _difficultyController.text = value;
+          setState(() {
+            _difficulty = value;
+          });
         }
       },
     );
